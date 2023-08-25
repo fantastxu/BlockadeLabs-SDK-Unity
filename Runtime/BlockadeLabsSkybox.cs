@@ -27,6 +27,8 @@ namespace BlockadeLabsSDK
         [HideInInspector] private float percentageCompleted = -1;
         private bool isCancelled;
 
+        public string textureURL { get; private set; }
+
         public async Task GetSkyboxStyleOptions()
         {
             if (string.IsNullOrWhiteSpace(apiKey) || apiKey.Contains("api.blockadelabs.com"))
@@ -86,10 +88,10 @@ namespace BlockadeLabsSDK
         {
             isCancelled = false;
             percentageCompleted = 1;
-
-            #if UNITY_EDITOR
-                progressId = Progress.Start("Generating Skybox Assets");
-            #endif
+            textureURL = "";
+#if UNITY_EDITOR    
+            progressId = Progress.Start("Generating Skybox Assets");
+#endif
 
             var createSkyboxObfuscatedId = await ApiRequests.CreateSkybox(skyboxStyleFields, id, apiKey);
 
@@ -151,6 +153,7 @@ namespace BlockadeLabsSDK
                     percentageCompleted = 66;
                     CalculateProgress();
                     textureUrl = getImagineResult["textureUrl"];
+                    textureURL = textureUrl;
                     prompt = getImagineResult["prompt"];
                     break;
                 }
@@ -159,7 +162,7 @@ namespace BlockadeLabsSDK
             if (isCancelled)
             {
                 percentageCompleted = -1;
-                imagineObfuscatedId = "";
+                imagineObfuscatedId = "";                
                 return;
             }
 
@@ -271,9 +274,10 @@ namespace BlockadeLabsSDK
         {
             isCancelled = true;
             percentageCompleted = -1;
-            #if UNITY_EDITOR
-                Progress.Remove(progressId);
-            #endif
+            textureURL = "";
+#if UNITY_EDITOR                
+            Progress.Remove(progressId);
+#endif
         }
     }
 }
